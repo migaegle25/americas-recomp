@@ -37,7 +37,6 @@ target_link_libraries(driver PRIVATE xbox_recompiler)
 add_executable(stages stages.cpp)
 target_link_libraries(stages PRIVATE xbox_recompiler)
 
-find_library(XBOX_VULKAN_LIB NAMES vulkan vulkan-1 REQUIRED)
 add_executable(exec exec.cpp)
 target_include_directories(exec PRIVATE "${XBOX_ROOT}/3rdparty/Vulkan-Headers/include")
-target_link_libraries(exec PRIVATE xbox_recompiler "${XBOX_VULKAN_LIB}")
+target_link_libraries(exec PRIVATE xbox_recompiler ${CMAKE_DL_LIBS})

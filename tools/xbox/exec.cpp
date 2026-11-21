@@ -12,8 +12,7 @@
 //   user <sgpr> <targetId>              (user data pair: low, high dword of the region address)
 //   userval <sgpr> <u32>
 //   user32 <sgpr> <targetId>   (a single 32-bit pointer register: the guest address of the region)
-//   lowguest   (give every region a guest address below 4 GiB; the BDA page table maps guest to device addresses; implied when a device
-//               address does not fit in 48 bits, as RADV hands out)
+//   lowguest   (give every region a guest address below 4 GiB; the BDA page table maps guest to device addresses)
 //   stage ps   (a pixel shader instead of a compute shader: draws one triangle that covers the whole target; the vertex shader
 //               comes from `vs <spv>` and writes constant interpolants; colour outputs are read back as out/target<i>.bin, RGBA32F)
 //   export <target> <mode> <mapping>   (SPI_SHADER_COL_FORMAT-style output mode, default 4 = FP16_ABGR; mapping default 0xe4 = identity)
@@ -24,7 +23,7 @@
 // Images and samplers are not implemented yet and make the run fail with a clear message.
 #include "Recompiler.hpp"
 #include "BdaAbi.hpp"
-#include <vulkan/vulkan.h>
+#include "vulkan_loader.hpp"
 #include <algorithm>
 #include <array>
 #include <cstdio>
@@ -111,7 +110,9 @@ Device CreateDevice(std::uint32_t wave, bool bary) {
     app.apiVersion = VK_API_VERSION_1_3;
     VkInstanceCreateInfo ici{VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO};
     ici.pApplicationInfo = &app;
+    LoadVulkanLoader();
     VK(vkCreateInstance(&ici, nullptr, &d.instance));
+    LoadVulkanInstance(d.instance);
     std::uint32_t count = 0;
     vkEnumeratePhysicalDevices(d.instance, &count, nullptr);
     std::vector<VkPhysicalDevice> devices(count);
